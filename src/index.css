@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+
+  --color-warm-ivory: #F4EFE6;
+  --color-soft-sand: #D8C6AE;
+  --color-champagne: #C6A77B;
+  --color-warm-bronze: #8B5E3C;
+  --color-espresso-brown: #2A1C14;
+  --color-charcoal: #171512;
+  --color-eco-green: #0E4D3C;
+  --color-accent-orange: #D86624;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth text-charcoal bg-warm-ivory;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight text-espresso-brown;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "GiantGreen EcoTech",
+  "description": "Premium hotel guest amenity solutions and pilot request platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
