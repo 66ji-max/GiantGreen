@@ -1,13 +1,25 @@
-import { Link } from 'react-router-dom';
+import { type MouseEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, MessageSquare, Calendar } from 'lucide-react';
 import Image from '../components/Image';
+import { siteConfig, getWhatsAppLink, WHATSAPP_PRESETS } from '../config/site';
 
 export default function Home() {
+  const navigate = useNavigate();
+  const bookingUrl = siteConfig.booking.getUrl();
+
+  const handleBookingClick = (e: MouseEvent) => {
+    if (!bookingUrl) {
+      e.preventDefault();
+      navigate('/contact?intent=schedule');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] flex items-center pt-20">
+      <section className="relative h-screen min-h-[640px] flex items-center pt-20">
         <div className="absolute inset-0 z-0">
           <Image 
             src="/visual-assets/product/jyanty-hero-landscape-01.jpg" 
@@ -15,7 +27,7 @@ export default function Home() {
             className="w-full h-full object-cover"
             fallbackColor="bg-espresso-brown"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-espresso-brown/90 via-espresso-brown/60 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-espresso-brown/95 via-espresso-brown/70 to-espresso-brown/30"></div>
         </div>
         
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 text-warm-ivory">
@@ -25,41 +37,59 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="max-w-2xl"
           >
-            <p className="text-xs md:text-sm font-semibold tracking-[0.2em] uppercase mb-4 text-champagne">
-              GiantGreen EcoTech<br/>
-              <span className="opacity-80">U.S.-headquartered &middot; Malaysia market operations</span>
-            </p>
-            <h1 className="text-5xl md:text-7xl font-serif font-light leading-tight mb-6 text-white">
+            <div className="inline-block mb-4">
+              <span className="text-xs md:text-sm font-semibold tracking-[0.2em] uppercase text-champagne block">
+                GiantGreen EcoTech
+              </span>
+              <span className="text-xs text-soft-sand/90 font-light block mt-0.5">
+                U.S.-headquartered &middot; Malaysia market operations
+              </span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-serif font-light leading-[1.12] mb-6 text-white">
               Elevating the smallest details of the luxury hotel stay.
             </h1>
-            <p className="text-lg md:text-xl text-soft-sand font-light leading-relaxed mb-10 max-w-xl">
+            <p className="text-base sm:text-lg md:text-xl text-soft-sand font-light leading-relaxed mb-10 max-w-xl">
               GiantGreen EcoTech develops focused guest-room amenity solutions that improve perceived quality, reduce single-use plastic and support more efficient hotel operations.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
               <Link 
                 to="/demo"
-                className="bg-accent-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all text-center w-full sm:w-auto"
+                className="bg-accent-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all text-center shadow-lg hover:shadow-accent-orange/20 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Request a Demo Kit
               </Link>
-              <a 
-                href={import.meta.env.VITE_GOOGLE_BOOKING_URL || '#'}
-                target="_blank"
-                rel="noreferrer"
-                className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center w-full sm:w-auto"
-              >
-                Book 15 Minutes
-              </a>
+              
+              {bookingUrl ? (
+                <a 
+                  href={bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-champagne" />
+                  Book 15 Minutes
+                </a>
+              ) : (
+                <button 
+                  onClick={handleBookingClick}
+                  className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4 text-champagne" />
+                  Book 15 Minutes
+                </button>
+              )}
             </div>
             
             <a 
-              href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '601124028365'}`}
+              href={getWhatsAppLink(WHATSAPP_PRESETS.homeHero)}
               target="_blank"
-              rel="noreferrer"
-              className="inline-block mt-8 text-sm font-medium text-champagne hover:text-white underline underline-offset-4 transition-colors"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 mt-8 text-sm font-medium text-champagne hover:text-white underline underline-offset-4 transition-colors"
             >
-              Speak on WhatsApp
+              <MessageSquare className="w-4 h-4 text-eco-green" />
+              Speak on WhatsApp ({siteConfig.contact.phoneDisplay})
             </a>
           </motion.div>
         </div>
@@ -83,7 +113,7 @@ export default function Home() {
           <div className="flex-1 w-full h-[500px]">
              <Image 
               src="/visual-assets/product/jyanty-lifestyle-portrait-01.jpg" 
-              alt="JYANTY detail"
+              alt="JYANTY detail in refined hotel bathroom setting"
               className="w-full h-full object-cover rounded-sm shadow-xl"
             />
           </div>
@@ -120,7 +150,7 @@ export default function Home() {
                 <div className="text-4xl font-serif text-champagne opacity-50 mb-4">0{index + 1}</div>
                 <div className="h-px w-full bg-white/10 mb-6"></div>
                 <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                <p className="text-soft-sand leading-relaxed">{step.desc}</p>
+                <p className="text-soft-sand leading-relaxed text-sm md:text-base">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -146,8 +176,8 @@ export default function Home() {
                   Improve tactile and visual quality, reducing the perception of a generic disposable amenity. JYANTY reinforces your hotel's attention to detail with every use.
                 </p>
               </div>
-              <div className="flex-1 w-full h-[300px]">
-                <Image src="/visual-assets/product/jyanty-hero-landscape-02.jpg" alt="Guest Experience" className="w-full h-full object-cover" />
+              <div className="flex-1 w-full h-[320px]">
+                <Image src="/visual-assets/product/jyanty-hero-landscape-02.jpg" alt="Guest Experience with JYANTY" className="w-full h-full object-cover rounded-sm shadow-md" />
               </div>
             </div>
 
@@ -160,8 +190,8 @@ export default function Home() {
                   Significantly reduce the disposal of full plastic toothbrushes. Future recycling partnerships are being explored as part of our longer-term closed-loop roadmap.
                 </p>
               </div>
-              <div className="flex-1 w-full h-[300px]">
-                <Image src="/visual-assets/backgrounds/warm-botanical-shadow-background.jpg" alt="Sustainability" className="w-full h-full object-cover" />
+              <div className="flex-1 w-full h-[320px]">
+                <Image src="/visual-assets/backgrounds/warm-botanical-shadow-background.jpg" alt="Sustainability and reduction of single-use plastics" className="w-full h-full object-cover rounded-sm shadow-md" />
               </div>
             </div>
 
@@ -174,8 +204,8 @@ export default function Home() {
                   Experience less unnecessary replacement during longer stays. You can start with small-scale, controlled pilots without the requirement for immediate property-wide rollout.
                 </p>
               </div>
-              <div className="flex-1 w-full h-[300px]">
-                <Image src="/visual-assets/backgrounds/warm-wood-stone-background.jpg" alt="Operational Value" className="w-full h-full object-cover" />
+              <div className="flex-1 w-full h-[320px]">
+                <Image src="/visual-assets/backgrounds/warm-wood-stone-background.jpg" alt="Operational Value and controlled pilot deployment" className="w-full h-full object-cover rounded-sm shadow-md" />
               </div>
             </div>
           </div>
@@ -196,8 +226,8 @@ export default function Home() {
             <ul className="space-y-4">
               {['Luxury city hotels', 'Resorts', 'Boutique hotels', 'Serviced residences', 'Executive and club floors', 'Properties with sustainability targets'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-lg text-charcoal/80">
-                  <CheckCircle2 className="w-5 h-5 text-warm-bronze" />
-                  {item}
+                  <CheckCircle2 className="w-5 h-5 text-warm-bronze shrink-0" />
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
@@ -214,27 +244,40 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link 
               to="/demo"
-              className="bg-accent-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all text-center"
+              className="bg-accent-orange text-white px-8 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all text-center shadow-md hover:scale-[1.02] active:scale-[0.98]"
             >
               Request a Compact Demo Kit
             </Link>
-            <a 
-              href={import.meta.env.VITE_GOOGLE_BOOKING_URL || '#'}
-              target="_blank"
-              rel="noreferrer"
-              className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center"
-            >
-              Schedule a 15-Minute Presentation
-            </a>
+            
+            {bookingUrl ? (
+              <a 
+                href={bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-4 h-4 text-champagne" />
+                Schedule a 15-Minute Presentation
+              </a>
+            ) : (
+              <button 
+                onClick={handleBookingClick}
+                className="px-8 py-4 rounded-full font-semibold text-white border border-white/30 hover:bg-white/10 transition-all text-center flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-4 h-4 text-champagne" />
+                Schedule a 15-Minute Presentation
+              </button>
+            )}
           </div>
           <div className="mt-8">
             <a 
-              href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '601124028365'}`}
+              href={getWhatsAppLink(WHATSAPP_PRESETS.homePilot)}
               target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium text-champagne hover:text-white underline underline-offset-4 transition-colors"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-medium text-champagne hover:text-white underline underline-offset-4 transition-colors"
             >
-              Speak on WhatsApp
+              <MessageSquare className="w-4 h-4 text-eco-green" />
+              Speak on WhatsApp ({siteConfig.contact.phoneDisplay})
             </a>
           </div>
         </div>
@@ -268,7 +311,7 @@ export default function Home() {
               }
             ].map((faq, i) => (
               <div key={i} className="border-b border-soft-sand pb-8">
-                <h4 className="text-xl font-semibold mb-3 font-serif">{faq.q}</h4>
+                <h3 className="text-xl font-semibold mb-3 font-serif">{faq.q}</h3>
                 <p className="text-charcoal/70 leading-relaxed">{faq.a}</p>
               </div>
             ))}
