@@ -15,10 +15,17 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
 import CookieNotice from './pages/CookieNotice';
 import NotFound from './pages/NotFound';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
   return (
     <Routes>
+      {/* Protected Administrator Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+
+      {/* Public Marketing & Hospitality Routes */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="jyanty" element={<Jyanty />} />

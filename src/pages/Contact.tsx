@@ -10,6 +10,7 @@ export default function Contact() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [privacyConsent, setPrivacyConsent] = useState(false);
   const [honeypot, setHoneypot] = useState('');
 
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
@@ -38,12 +39,16 @@ export default function Contact() {
     if (!message.trim() || message.trim().length < 5) {
       errors.message = 'Please provide a message or inquiry details (at least 5 characters).';
     }
+    if (!privacyConsent) {
+      errors.privacyConsent = 'You must agree to the Privacy Policy before submitting.';
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setSubmitError(null);
 
     if (!validate()) {
@@ -62,26 +67,27 @@ export default function Contact() {
           name: name.trim(),
           email: email.trim(),
           message: message.trim(),
+          privacyConsent,
           honeypot: honeypot.trim(),
         }),
       });
 
       const result = await response.json().catch(() => null);
 
-      if (!response.ok || !result?.success) {
+      if (!response.ok || !result?.success || !result?.referenceId) {
         throw new Error(
           result?.error ||
-            'We were unable to deliver your message at this moment. Please use our direct WhatsApp or Email channels below.'
+            'We were unable to save your inquiry at this moment. Please use our direct WhatsApp or Email channels below.'
         );
       }
 
-      setReferenceId(result.referenceId || `GG-MSG-${Date.now()}`);
+      setReferenceId(result.referenceId);
       setIsSuccess(true);
       setName('');
       setEmail('');
       setMessage('');
+      setPrivacyConsent(false);
     } catch (err: any) {
-      console.error('Contact submission error:', err);
       setSubmitError(
         err.message ||
           'Failed to connect to the inquiry submission service. Please contact us directly via WhatsApp or email.'
@@ -105,7 +111,7 @@ export default function Contact() {
           {/* Left Column: Direct Contact Info */}
           <div className="flex-1">
             <span className="text-xs font-semibold tracking-[0.2em] uppercase text-warm-bronze mb-2 block">
-              Inquiries & Hospitality Partnerships
+              Inquiries &amp; Hospitality Partnerships
             </span>
             <h1 className="text-4xl md:text-6xl font-serif leading-tight mb-6">Contact Us</h1>
             <p className="text-lg md:text-xl text-charcoal/70 font-light mb-10 leading-relaxed">
@@ -115,8 +121,10 @@ export default function Contact() {
             {isScheduleIntent && (
               <div className="mb-8 p-4 bg-champagne/15 border border-champagne/40 rounded-sm">
                 <p className="text-sm font-medium text-espresso-brown flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-warm-bronze" />
-                  <strong>Schedule a 15-Minute Introduction:</strong> Complete the form or reach out directly on WhatsApp to coordinate an optimal meeting time.
+                  <Calendar className="w-4 h-4 text-warm-bronze shrink-0" />
+                  <span>
+                    <strong>Schedule a 15-Minute Introduction:</strong> Complete the form or reach out directly on WhatsApp to coordinate an optimal meeting time.
+                  </span>
                 </p>
               </div>
             )}
@@ -217,7 +225,7 @@ export default function Contact() {
           <div className="flex-1 bg-white p-8 md:p-12 border border-soft-sand/30 rounded-sm shadow-sm">
             <h2 className="text-2xl font-serif mb-2 text-charcoal">Send a Direct Message</h2>
             <p className="text-sm text-charcoal/60 mb-8">
-              Fill in your details below and our hospitality team will respond within 24 hours.
+              Fill in your details below and our hospitality team will respond promptly.
             </p>
 
             {isSuccess ? (
@@ -225,9 +233,9 @@ export default function Contact() {
                 <div className="w-16 h-16 bg-eco-green/10 text-eco-green rounded-full flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="text-2xl font-serif text-charcoal">Message Successfully Received</h3>
+                <h3 className="text-2xl font-serif text-charcoal">Message Successfully Recorded</h3>
                 <p className="text-charcoal/70 text-sm max-w-md mx-auto">
-                  Thank you for reaching out to GiantGreen EcoTech. Your message has been logged with reference ID:
+                  Thank you for reaching out to GiantGreen EcoTech. Your inquiry has been saved with reference ID:
                 </p>
                 <div className="inline-block px-4 py-2 bg-warm-ivory border border-soft-sand rounded font-mono text-sm font-semibold text-charcoal">
                   {referenceId}
@@ -278,7 +286,7 @@ export default function Contact() {
                         rel="noopener noreferrer"
                         className="text-xs bg-eco-green text-white px-3 py-1.5 rounded-full font-semibold hover:opacity-90 transition-opacity"
                       >
-                        Send via WhatsApp (+60 123629153)
+                        Send via WhatsApp ({siteConfig.contact.phoneDisplay})
                       </a>
                       <a
                         href={fallbackMailto}
@@ -353,6 +361,33 @@ export default function Contact() {
                   )}
                 </div>
 
+                <div>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="contact-privacy"
+                      checked={privacyConsent}
+                      onChange={(e) => {
+                        setPrivacyConsent(e.target.checked);
+                        if (fieldErrors.privacyConsent) {
+                          setFieldErrors((prev) => ({ ...prev, privacyConsent: '' }));
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 rounded border-soft-sand text-charcoal focus:ring-accent-orange cursor-pointer"
+                    />
+                    <label htmlFor="contact-privacy" className="text-xs text-charcoal/70 leading-relaxed cursor-pointer">
+                      I agree to the{' '}
+                      <Link to="/privacy" target="_blank" className="underline text-charcoal hover:text-accent-orange">
+                        Privacy Policy
+                      </Link>{' '}
+                      and consent to GiantGreen EcoTech storing and processing this inquiry to respond to my request.
+                    </label>
+                  </div>
+                  {fieldErrors.privacyConsent && (
+                    <p className="text-red-600 text-xs mt-1.5 font-medium">{fieldErrors.privacyConsent}</p>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -361,7 +396,7 @@ export default function Contact() {
                   {isSubmitting ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Transmitting Message...</span>
+                      <span>Submitting Inquiry...</span>
                     </>
                   ) : (
                     <span>Submit Message</span>

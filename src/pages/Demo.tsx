@@ -51,6 +51,7 @@ export default function Demo() {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     setSubmissionError(null);
     setLastSubmittedData(data);
@@ -79,18 +80,17 @@ export default function Demo() {
 
       const result = await response.json().catch(() => null);
 
-      if (!response.ok || !result?.success) {
+      if (!response.ok || !result?.success || !result?.referenceId) {
         throw new Error(
           result?.error ||
             'We were unable to record your demo request in our database. Please reach out to us directly via WhatsApp or email.'
         );
       }
 
-      setReferenceId(result.referenceId || `GG-DEMO-${Date.now()}`);
+      setReferenceId(result.referenceId);
       setIsSuccess(true);
       reset();
     } catch (err: any) {
-      console.error('Demo request submission failed:', err);
       setSubmissionError(
         err.message ||
           'Failed to record your Demo Kit request. Please use our direct WhatsApp or Email channels.'
